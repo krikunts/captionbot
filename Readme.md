@@ -2,7 +2,7 @@
 
 [![PyPi Package Version](https://img.shields.io/pypi/v/captionbot.svg)](https://pypi.python.org/pypi/captionbot)
 
-Captionbot is a simple API wrapper for https://captionbot.ai
+Captionbot is a simple API wrapper for https://www.captionbot.ai/
 
 ## Installation
 
