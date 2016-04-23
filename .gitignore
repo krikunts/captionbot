@@ -1,3 +1,6 @@
-# Byte-compiled / optimized / DLL files
+# Byte-compiled / optimized files
 __pycache__/
 *.pyc
+MANIFEST
+dist/
+*.egg-info/
