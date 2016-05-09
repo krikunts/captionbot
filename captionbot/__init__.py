@@ -1,1 +1,1 @@
-from captionbot import CaptionBot
+from .captionbot import CaptionBot
