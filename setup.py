@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='captionbot',
-      version='0.1.1',
+      version='0.1.2',
       description='Simple API wrapper for https://www.captionbot.ai/',
       url='http://github.com/lucky-user/captionbot',
       author='Tatiana Krikun',

@@ -2,6 +2,7 @@ import json
 import mimetypes
 import os
 import requests
+from urllib import urlencode
 import logging
 logger = logging.getLogger("captionbot")
 
@@ -42,21 +43,29 @@ class CaptionBot:
         return resp.json()
 
     def url_caption(self, image_url):
-        data = json.dumps({
+        data = {
             "userMessage": image_url,
             "conversationId": self.conversation_id,
             "waterMark": self.watermark
-        })
+        }
         headers = {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json; charset=utf-8"
         }
         url = self.BASE_URL + "message"
-        resp = self.session.post(url, data=data, headers=headers, verify=False)
-        logger.debug("url_caption: {}".format(resp))
-        self._resp_error(resp)
-        res = json.loads(resp.json())
+        resp = self.session.post(url, data=json.dumps(data), headers=headers, verify=False)
+        logger.info("get_caption: {}".format(resp))
+        if not resp.ok:
+            return None
+        get_url = url + "?" + urlencode(data)
+        resp = self.session.get(get_url, verify=False)
+        if not resp.ok:
+            return None
+        text = resp.text[1:-1].replace('\\"', '"')
+        res = json.loads(text)
+        logger.info(res)
         self.watermark = res.get("WaterMark")
-        return res.get("UserMessage")
+        msg = res.get("BotMessages")[1].replace('\\n','\n')
+        return msg
 
     def file_caption(self, filename):
         upload_filename = self._upload(filename)
