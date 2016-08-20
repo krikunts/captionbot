@@ -2,7 +2,10 @@ import json
 import mimetypes
 import os
 import requests
-from urllib import urlencode
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
 import logging
 logger = logging.getLogger("captionbot")
 
