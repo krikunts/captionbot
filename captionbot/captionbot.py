@@ -29,7 +29,7 @@ class CaptionBot:
     def __init__(self):
         self.session = requests.Session()
         url = self.BASE_URL + "init"
-        resp = self.session.get(url, verify=False)
+        resp = self.session.get(url)
         logger.debug("init: {}".format(resp))
         self._resp_error(resp)
         self.conversation_id = resp.json()
@@ -40,7 +40,7 @@ class CaptionBot:
         mime = mimetypes.guess_type(filename)[0]
         name = os.path.basename(filename)
         files = {'file': (name, open(filename, 'rb'), mime)}
-        resp = self.session.post(url, files=files, verify=False)
+        resp = self.session.post(url, files=files)
         logger.debug("upload: {}".format(resp))
         self._resp_error(resp)
         return resp.json()
@@ -55,12 +55,12 @@ class CaptionBot:
             "Content-Type": "application/json; charset=utf-8"
         }
         url = self.BASE_URL + "message"
-        resp = self.session.post(url, data=json.dumps(data), headers=headers, verify=False)
+        resp = self.session.post(url, data=json.dumps(data), headers=headers)
         logger.info("get_caption: {}".format(resp))
         if not resp.ok:
             return None
         get_url = url + "?" + urlencode(data)
-        resp = self.session.get(get_url, verify=False)
+        resp = self.session.get(get_url)
         if not resp.ok:
             return None
         text = resp.text[1:-1].replace('\\"', '"')
