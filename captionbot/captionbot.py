@@ -15,7 +15,8 @@ class CaptionBotException(Exception):
 
 
 class CaptionBot:
-    BASE_URL = "https://www.captionbot.ai/api/"
+    UPLOAD_URL = "https://www.captionbot.ai/api/upload"
+    MESSAGES_URL = "https://captionbot.azurewebsites.net/api/messages"
 
     @staticmethod
     def _resp_error(resp):
@@ -28,47 +29,33 @@ class CaptionBot:
 
     def __init__(self):
         self.session = requests.Session()
-        url = self.BASE_URL + "init"
-        resp = self.session.get(url)
-        logger.debug("init: {}".format(resp))
-        self._resp_error(resp)
-        self.conversation_id = resp.json()
-        self.watermark = ''
 
     def _upload(self, filename):
-        url = self.BASE_URL + "upload"
+        url = self.UPLOAD_URL
         mime = mimetypes.guess_type(filename)[0]
         name = os.path.basename(filename)
         files = {'file': (name, open(filename, 'rb'), mime)}
         resp = self.session.post(url, files=files)
         logger.debug("upload: {}".format(resp))
         self._resp_error(resp)
-        return resp.json()
+        return resp.text
 
     def url_caption(self, image_url):
         data = {
-            "userMessage": image_url,
-            "conversationId": self.conversation_id,
-            "waterMark": self.watermark
+            "Content": image_url,
+            "Type": "CaptionRequest",
         }
         headers = {
             "Content-Type": "application/json; charset=utf-8"
         }
-        url = self.BASE_URL + "message"
+        url = self.MESSAGES_URL
         resp = self.session.post(url, data=json.dumps(data), headers=headers)
         logger.info("get_caption: {}".format(resp))
         if not resp.ok:
             return None
-        get_url = url + "?" + urlencode(data)
-        resp = self.session.get(get_url)
-        if not resp.ok:
-            return None
-        text = resp.text[1:-1].replace('\\"', '"')
-        res = json.loads(text)
+        res = resp.text[1:-1].replace('\\"', '"').replace('\\n', '\n')
         logger.info(res)
-        self.watermark = res.get("WaterMark")
-        msg = res.get("BotMessages")[1].replace('\\n','\n')
-        return msg
+        return res
 
     def file_caption(self, filename):
         upload_filename = self._upload(filename)
