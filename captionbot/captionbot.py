@@ -38,7 +38,9 @@ class CaptionBot:
         resp = self.session.post(url, files=files)
         logger.debug("upload: {}".format(resp))
         self._resp_error(resp)
-        return resp.text
+        res = resp.text
+        if res:
+            return res[1:-1]
 
     def url_caption(self, image_url):
         data = {
